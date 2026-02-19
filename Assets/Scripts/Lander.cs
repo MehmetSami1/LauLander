@@ -46,6 +46,7 @@ public class Lander : MonoBehaviour
     {
         WaitingToStart,
         Normal,
+        GameOver,
     }
 
 
@@ -77,11 +78,7 @@ public class Lander : MonoBehaviour
                 if (Keyboard.current.wKey.isPressed || Keyboard.current.aKey.isPressed || Keyboard.current.dKey.isPressed)
                 {
                     landerRigidbody2D.gravityScale = GRAVITY_NORMAL;
-                    state = State.Normal;
-                    OnStateChanged?.Invoke(this, new OnStateChangedEventArgs
-                    {
-                        state = state
-                    });
+                    SetState(State.Normal);
                 }
 
                 break;
@@ -117,7 +114,8 @@ public class Lander : MonoBehaviour
                     OnRightForce?.Invoke(this, EventArgs.Empty);
                 }
                 break;
-
+            case State.GameOver:
+                break;
         }
         
 
@@ -137,6 +135,7 @@ public class Lander : MonoBehaviour
                 scoreMultiplier = 0f,
                 score = 0,
             });
+            SetState(State.GameOver);
             return;
         }
       
@@ -155,6 +154,7 @@ public class Lander : MonoBehaviour
                 scoreMultiplier =0f,
                 score = 0,
             });
+            SetState(State.GameOver);
             return;
         }
 
@@ -171,6 +171,7 @@ public class Lander : MonoBehaviour
                 scoreMultiplier =0f,
                 score =0,
             });
+            SetState(State.GameOver);
             return;
         }
 
@@ -196,7 +197,9 @@ public class Lander : MonoBehaviour
             landingSpeed=relativeVelocityMagnitude,
             scoreMultiplier=landingPad.GetScoreMultiplier(),
             score =score,
+
         });
+        SetState(State.GameOver);
     }
 
     private void OnTriggerEnter2D(Collider2D collider2D)
@@ -220,6 +223,14 @@ public class Lander : MonoBehaviour
         }
     }
 
+    private void SetState(State state)
+    {
+        this.state = state;
+        OnStateChanged?.Invoke(this,new OnStateChangedEventArgs
+        {
+            state=state,
+        });
+    }
     private void ConsumeFuel() {
         float fuelConsumptionAmount = 1f;
         fuelAmount -= fuelConsumptionAmount * Time.deltaTime;
